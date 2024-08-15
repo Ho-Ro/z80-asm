@@ -1,0 +1,15 @@
+*.o
+
+.*~
+*~
+*.bak
+*.new
+*.old
+*.orig
+
+z80-asm
+
+*.bin
+*.com
+*.hex
+*.z80
