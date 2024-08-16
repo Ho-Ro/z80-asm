@@ -99,6 +99,7 @@ memory.o: memory.c z80-cpu.h z80-mon.h z80-global
 
 interrupt.o: interrupt.c z80-cpu.h decode.h z80-mon.h z80-global \
              hardware/daisy_chain.h
+kk_ihex_write.o: kk_ihex_write.c kk_ihex_write.h kk_ihex.h
 
 dummy.o: dummy.c
 
@@ -117,7 +118,8 @@ cpu.a: execute.o decode-table.o decode.o memory.o ports.o
 	ar rcs cpu.a execute.o decode-table.o decode.o memory.o ports.o
 
 
-$(ASM): z80-asm.o dummy.o asm.a $(HW)
-	gcc -lc -o $(ASM) z80-asm.o dummy.o asm.a $(HW)
+$(ASM): z80-asm.o dummy.o kk_ihex_write.o asm.a $(HW)
+	gcc -lc -o $(ASM) z80-asm.o dummy.o kk_ihex_write.o asm.a $(HW)
+
 $(MONI): z80-mon.o cpu.a console.o asm.a $(HW)
 	gcc -lc -o $(MONI) z80-mon.o cpu.a console.o asm.a $(HW)
