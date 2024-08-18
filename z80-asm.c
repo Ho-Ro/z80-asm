@@ -12,6 +12,7 @@
 
 static FILE *input;
 static FILE *outbin;
+static FILE *outz80;
 static FILE *outhex;
 
 static unsigned char memory[MAX_MEM];
@@ -36,7 +37,7 @@ int main( int argc, char **argv ) {
     
     struct ihex_state ihex_;
 
-    int i, j, result = 0, fill = 0, offset = -1, z80 = 0,
+    int i, j, result = 0, fill = 0, offset = -1,
         reference = 0, no_outfile = 0;
 
     for ( i = 1, j = 0; i < argc; i++ ) {
@@ -58,13 +59,7 @@ int main( int argc, char **argv ) {
                 case 'r':
                     reference = 1;
                     break;
-                //case 'c':
-                //    offset = com = 0x0100; // CP/M *.com files start at address 0x0100
-                //    break;
-                case 'z':
-                    z80 = 1;
-                    break;
-                case 'f': // fill 
+                case 'f': // fill
                     if ( argv[i][++j] ) // "-fXX"
                         result = sscanf( argv[i]+j, "%x", &fill );
                     else if ( i < argc - 1 ) // "-f XX"
@@ -132,10 +127,18 @@ int main( int argc, char **argv ) {
     if ( !no_outfile && strlen( filename ) > 4 &&
         !strcmp( filename + strlen( filename ) - 4,".asm") ) {
         // create out file name(s) from in file name
-        sprintf( filename + strlen( filename ) - 3, z80 ? "z80" : "bin" );
+        sprintf( filename + strlen( filename ) - 3, "bin" );
         MSG( 1, "Creating output file %s\n", filename );
         outbin = fopen( filename, "wb" );
-        if ( !outbin ) {    
+        if ( !outbin ) {
+            asm_close();
+            fprintf( stderr,"Error: Can't open output file \"%s\".\n", filename );
+            return 1;
+        }
+        sprintf( filename + strlen( filename ) - 3, "z80" );
+        MSG( 1, "Creating output file %s\n", filename );
+        outz80 = fopen( filename, "wb" );
+        if ( !outz80 ) {
             asm_close();
             fprintf( stderr,"Error: Can't open output file \"%s\".\n", filename );
             return 1;
@@ -150,7 +153,6 @@ int main( int argc, char **argv ) {
             fprintf( stderr, "Error: Can't open output file \"%s\".\n", filename );
             return 1;
         }
-
     } else
         MSG( 1, "No output files created\n" );
 
@@ -186,8 +188,9 @@ int main( int argc, char **argv ) {
         if ( generated_bytes() && highest_address() >= start ) {
             if ( LISTING )
                 printf( "Using memory region $%04X .. $%04X\n", start, highest_address() );
-            if ( z80 )
-                write_header( outbin, start );
+            // if ( z80 )
+            write_header( outz80, start );
+            fwrite( memory + start, 1, highest_address() + 1 - start, outz80 );
             fwrite( memory + start, 1, highest_address() + 1 - start, outbin );
         }
         if ( ihex ) {
@@ -196,6 +199,7 @@ int main( int argc, char **argv ) {
             ihex = NULL;
         }
         fclose( outbin );
+        fclose( outz80 );
     }
 
     int a, b;
@@ -237,8 +241,6 @@ static void usage( const char *fullpath ) {
         "    -l       Create listing\n"
         "    -r       Create cross reference\n"
         "    -n       Do not create output files, just analyse the source code\n"
-        //"    -c       Create a *.com binary file with file offset of $0100\n"
-        "    -z       Create a *.z80 bimary file with offset address in header\n"
         "    -o XXXX  Set the binary file offset to $XXXX\n"
         "    -f XX    Fill unused memory with $XX\n",
         progname
