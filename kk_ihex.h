@@ -130,19 +130,19 @@ typedef int ihex_count_t;
 #endif
 
 enum ihex_flags {
-    IHEX_FLAG_ADDRESS_OVERFLOW = 0x80   // 16-bit address overflow
+    IHEX_FLAG_ADDRESS_OVERFLOW = 0x80 // 16-bit address overflow
 };
 typedef uint8_t ihex_flags_t;
 
 typedef struct ihex_state {
-    ihex_address_t  address;
+    ihex_address_t address;
 #ifndef IHEX_DISABLE_SEGMENTS
-    ihex_segment_t  segment;
+    ihex_segment_t segment;
 #endif
-    ihex_flags_t    flags;
-    uint8_t         line_length;
-    uint8_t         length;
-    uint8_t         data[IHEX_LINE_MAX_LENGTH + 1];
+    ihex_flags_t flags;
+    uint8_t line_length;
+    uint8_t length;
+    uint8_t data[ IHEX_LINE_MAX_LENGTH + 1 ];
 } kk_ihex_t;
 
 enum ihex_record_type {
@@ -161,7 +161,7 @@ typedef uint8_t ihex_record_type_t;
 // segmented addressing not be used (and indeed the write function of this
 // library uses linear 32-bit addressing unless manually overridden).
 //
-#define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address + (((ihex_address_t)((ihex)->segment)) << 4))
+#define IHEX_LINEAR_ADDRESS( ihex ) ( ( ihex )->address + ( ( (ihex_address_t)( ( ihex )->segment ) ) << 4 ) )
 //
 // Note that segmented addressing with the above macro is not strictly adherent
 // to the IHEX specification, which mandates that the lowest 16 bits of the
@@ -172,12 +172,13 @@ typedef uint8_t ihex_record_type_t;
 // To implement fully correct segmented addressing, compute the address
 // of _each byte_ with its index in `data` as follows:
 //
-#define IHEX_BYTE_ADDRESS(ihex, byte_index) ((((ihex)->address + (byte_index)) & 0xFFFFU) + (((ihex_address_t)((ihex)->segment)) << 4))
+#define IHEX_BYTE_ADDRESS( ihex, byte_index ) \
+    ( ( ( ( ihex )->address + ( byte_index ) ) & 0xFFFFU ) + ( ( (ihex_address_t)( ( ihex )->segment ) ) << 4 ) )
 
 #else // IHEX_DISABLE_SEGMENTS:
 
-#define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address)
-#define IHEX_BYTE_ADDRESS(ihex, byte_index) ((ihex)->address + (byte_index))
+#define IHEX_LINEAR_ADDRESS( ihex ) ( ( ihex )->address )
+#define IHEX_BYTE_ADDRESS( ihex, byte_index ) ( ( ihex )->address + ( byte_index ) )
 
 #endif
 

@@ -4,6 +4,6 @@
 #define __INSTR_H
 
 #include "instr_token"
-extern const struct seznam_type instruction[N_INSTRUCTIONS];
+extern const struct seznam_type instruction[ N_INSTRUCTIONS ];
 
 #endif

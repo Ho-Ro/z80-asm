@@ -96,7 +96,7 @@ extern "C" {
 #endif
 
 // Length of the write buffer required
-#define IHEX_WRITE_BUFFER_LENGTH (1+2+4+2+(IHEX_MAX_OUTPUT_LINE_LENGTH*2)+2+sizeof(IHEX_NEWLINE_STRING))
+#define IHEX_WRITE_BUFFER_LENGTH ( 1 + 2 + 4 + 2 + ( IHEX_MAX_OUTPUT_LINE_LENGTH * 2 ) + 2 + sizeof( IHEX_NEWLINE_STRING ) )
 
 #ifdef IHEX_EXTERNAL_WRITE_BUFFER
 // Define `IHEX_EXTERNAL_WRITE_BUFFER` to provide an external write buffer,
@@ -107,7 +107,7 @@ extern char *ihex_write_buffer;
 #endif
 
 // Initialise the structure `ihex` for writing
-void ihex_init(struct ihex_state *ihex);
+void ihex_init( struct ihex_state *ihex );
 
 // Begin writing at the given 32-bit `address` after writing any
 // pending data at the current address.
@@ -115,18 +115,16 @@ void ihex_init(struct ihex_state *ihex);
 // This can also be used to skip to a new address without calling
 // `ihex_end_write`; this allows writing sparse output.
 //
-void ihex_write_at_address(struct ihex_state *ihex, ihex_address_t address);
+void ihex_write_at_address( struct ihex_state *ihex, ihex_address_t address );
 
 // Write a single byte
-void ihex_write_byte(struct ihex_state *ihex, int b);
+void ihex_write_byte( struct ihex_state *ihex, int b );
 
 // Write `count` bytes from `data`
-void ihex_write_bytes(struct ihex_state * restrict ihex,
-                      const void * restrict data,
-                      ihex_count_t count);
+void ihex_write_bytes( struct ihex_state *restrict ihex, const void *restrict data, ihex_count_t count );
 
 // End writing (flush buffers, write end of file record)
-void ihex_end_write(struct ihex_state *ihex);
+void ihex_end_write( struct ihex_state *ihex );
 
 // Called whenever the global, internal write buffer needs to be flushed by
 // the write functions. The implementation is NOT provided by this library;
@@ -145,8 +143,7 @@ void ihex_end_write(struct ihex_state *ihex);
 // Note that the contents of `buffer` can become invalid immediately after
 // this function returns - the data must be copied if it needs to be preserved!
 //
-extern void ihex_flush_buffer(struct ihex_state *ihex,
-                              char *buffer, char *eptr);
+extern void ihex_flush_buffer( struct ihex_state *ihex, char *buffer, char *eptr );
 
 // As `ihex_write_at_address`, but specify a segment selector. Note that
 // segments are not automatically incremented when the 16-bit address
@@ -156,15 +153,13 @@ extern void ihex_flush_buffer(struct ihex_state *ihex,
 // segment needs to be changed.
 //
 #ifndef IHEX_DISABLE_SEGMENTS
-void ihex_write_at_segment(struct ihex_state *ihex,
-                           ihex_segment_t segment,
-                           ihex_address_t address);
+void ihex_write_at_segment( struct ihex_state *ihex, ihex_segment_t segment, ihex_address_t address );
 #endif
 
 // Set the output line length to `length` - may be safely called only right
 // after `ihex_write_at_address` or `ihex_write_at_segment`. The maximum
 // is IHEX_LINE_MAX_LENGTH (which may be changed at compile time).
-void ihex_set_output_line_length(struct ihex_state *ihex, uint8_t line_length);
+void ihex_set_output_line_length( struct ihex_state *ihex, uint8_t line_length );
 
 #ifdef __cplusplus
 }
