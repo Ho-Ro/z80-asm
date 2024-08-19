@@ -353,15 +353,15 @@ switch (v)
 int 
 c_in(int v1,int t2,int v2)
 {
-if (t2==A_PODLE_NUM)
+if (t2==A_PODLE_NUM) // (nn)
  {
- if (v1==R_A)
+ if (v1==R_A) // in a, (nn)
  {  out(0xdb);  out(v2);
     return  v2>255 ? 8 : 0 ;
  }
  else return 1;
  }
-if (t2==A_PODLE_REG&&v2==R_C)
+if (t2==A_PODLE_REG&&v2==R_C) // (c)
  {
  switch(v1)
   {
@@ -385,6 +385,9 @@ if (t2==A_PODLE_REG&&v2==R_C)
   break;
   case R_L:
   out(0xed);out(0x68);
+  break;
+  case R_EMPTY: // in (c)
+  out(0xed);out(0x70);
   break;
   default:
   return 1;
@@ -479,15 +482,15 @@ return 0;
 int 
 c_out(int t1,int v1,int v2)
 {
-if (t1==A_PODLE_NUM)
+if (t1==A_PODLE_NUM) // (nn)
  {
- if (v2==R_A)
+ if (v2==R_A) // out (nn), a
  {  out(0xd3);out(v1);
     return  v1>255 ? 8 : 0 ;
  }
  else return 1;
  }
-if (t1==A_PODLE_REG&&v1==R_C)
+if (t1==A_PODLE_REG&&v1==R_C) // (c)
  {
  switch(v2)
   {
@@ -511,6 +514,9 @@ if (t1==A_PODLE_REG&&v1==R_C)
   break;
   case R_L:
   out(0xed);out(0x69);
+  break;
+  case R_EMPTY: // undocumented out (c), 0
+  out(0xed);out(0x71);
   break;
   default:
   return 1;

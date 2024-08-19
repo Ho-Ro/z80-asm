@@ -448,7 +448,7 @@ static unsigned char  no_para[] =
         1<<0, 1<<0, 1<<0,
         1<<2, 1<<2, 1<<2,
         1<<0, 1<<0, 1<<0, 1<<0,
-        1<<2, 1<<0, 1<<0, 1<<0, 1<<0,
+        1<<1|1<<2, 1<<0, 1<<0, 1<<0, 1<<0, // HACK for IN (C)
         1<<2, 1<<0, 1<<0, 1<<0, 1<<0,
         1<<0, 1<<0, 1<<0, 1<<0, 1<<1,
 
@@ -858,14 +858,16 @@ if (!ret)
        {error(lineno,txt,msg[IA]);ret=1;break;}
       c_im(lex.arg->value);
       break;
- 
+
       case I_IN:
       if (!lex.arg){error(lineno,txt,msg[MIS1]);ret=1;break;}
-      if (!lex.arg->next){error(lineno,txt,msg[MIS2]);ret=1;break;}
-      if (lex.arg->next->next){error(lineno,txt,msg[TOO]);ret=1;break;}
-      if (lex.arg->type!=A_REG){error(lineno,txt,msg[IA1]);ret=1;break;}
-      a=c_in(lex.arg->value,lex.arg->next->type,lex.arg->next->value);
-      if (a==1) {error(lineno,txt,msg[IA]);ret=1;break;}
+      if (!lex.arg->next){a=c_in(R_EMPTY,lex.arg->type,lex.arg->value);} // in (c)
+      else {
+        if (lex.arg->next->next){error(lineno,txt,msg[TOO]);ret=1;break;}
+        if (lex.arg->type!=A_REG){error(lineno,txt,msg[IA1]);ret=1;break;}
+        a=c_in(lex.arg->value,lex.arg->next->type,lex.arg->next->value);
+      }
+      if (a==1) {error(lineno,txt,msg[IA]);ret=1;}
       break;
 
       case I_INC:
@@ -886,9 +888,12 @@ if (!ret)
       if (!lex.arg){error(lineno,txt,msg[MIS1]);ret=1;break;}
       if (!lex.arg->next){error(lineno,txt,msg[MIS2]);ret=1;break;}
       if (lex.arg->next->next){error(lineno,txt,msg[TOO]);ret=1;break;}
-      if (lex.arg->next->type!=A_REG){error(lineno,txt,msg[IA2]);ret=1;break;}
+      if (lex.arg->next->type!=A_REG &&
+         (lex.arg->next->type!=A_NUM || lex.arg->next->value)){
+            error(lineno,txt,msg[IA2]);ret=1;break;
+      }
       a=c_out(lex.arg->type,lex.arg->value,lex.arg->next->value);
-      if (a==1) {error(lineno,txt,msg[IA]);ret=1;break;}
+      if (a==1) {error(lineno,txt,msg[IA]);ret=1;}
       break;
 
       case I_POP:
